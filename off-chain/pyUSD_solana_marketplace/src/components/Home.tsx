@@ -12,7 +12,7 @@ import {
   TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
-import { Connection } from "@solana/web3.js";
+import { Connection, Transaction } from "@solana/web3.js";
 const anchor = require("@project-serum/anchor");
 
 const Home: React.FC = () => {
@@ -121,6 +121,9 @@ const Home: React.FC = () => {
     try {
       const provider = getProvider();
 
+      const RPC_URL = "https://api.devnet.solana.com";
+      const connection = new Connection(RPC_URL);
+
       if (provider.publicKey.toBase58() === cart.owner) {
         alert("You cannot buy your own NFT");
         return;
@@ -171,7 +174,54 @@ const Home: React.FC = () => {
           associated_token_program: ASSOCIATED_TOKEN_PROGRAM_ID,
         })
         .rpc();
-      console.log("transfer PYUSD tx signature: ", transferPyUsdTx);
+      console.log("transferPyUsdTx: ", transferPyUsdTx);
+      /////////////////////////////////////////
+      // const transaction = new Transaction();
+      // const transferPyusdInstruction = await program.methods
+      //   .transferPyusd(indexInCart, sale_lamport)
+      //   .accounts({
+      //     state: new web3.PublicKey(
+      //       "AnR3zjop64VcbxLdgLve3ix4vNx9pG5UfdtSc3KJ8PAr"
+      //     ),
+      //     mint: new web3.PublicKey(
+      //       "CXk2AMBfi3TwaEL2468s6zP8xq9NxTXjp9gjMgzeUynM"
+      //     ),
+      //     signer: new web3.PublicKey(provider.publicKey),
+      //     sender: new web3.PublicKey(provider.publicKey),
+      //     recipient: new web3.PublicKey(cart.owner),
+      //     sender_token_account: senderAta,
+      //     recipient_token_account: recipientAta,
+      //     token_program: TOKEN_2022_PROGRAM_ID,
+      //     system_program: web3.SystemProgram.programId,
+      //     associated_token_program: ASSOCIATED_TOKEN_PROGRAM_ID,
+      //   })
+      //   .instruction();
+      // console.log("transferPyusdInstruction: ", transferPyusdInstruction);
+      // transaction.add(transferPyusdInstruction);
+      // console.log("transaction: ", transaction);
+
+      // let blockhash = (await connection.getLatestBlockhash()).blockhash;
+      // transaction.recentBlockhash = blockhash;
+      // transaction.feePayer = new web3.PublicKey(provider.publicKey);
+
+      // const fees = await transaction.getEstimatedFee(connection);
+      // console.log("transfer PYUSD tx fees: ", fees);
+
+      // // const { signature } = await provider.signAndSendTransaction(transaction, {
+      // //   skipPreflight: true,
+      // // });
+      // const { signature } = await provider.signAndSendTransaction(transaction);
+
+      // const { value } = await connection.getSignatureStatus(signature);
+      // const confirmationStatus = value?.confirmationStatus;
+
+      // console.log(
+      //   "transfer PYUSD tx confirmation status: ",
+      //   confirmationStatus
+      // );
+      // console.log("transfer PYUSD tx signature: ", signature);
+      //////////////////////////////////////////
+
       alert("Payment successful!");
     } catch (error) {
       console.log("error calling buy_nft: ", error);

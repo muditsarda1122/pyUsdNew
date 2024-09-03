@@ -65,19 +65,42 @@ pub mod solana_nft_anchor {
         let sender_ata = &ctx.accounts.sender; // buyer
         let recipient_ata = &ctx.accounts.recipient; // seller
 
-        let transfer_pyusd_context = TransferChecked {
-            from: ctx.accounts.sender_token_account.to_account_info(),
-            mint: ctx.accounts.mint.to_account_info(),
-            to: ctx.accounts.recipient_token_account.to_account_info(),
-            authority: ctx.accounts.sender.to_account_info(),
-        };
+        //// Attempt 1: failed
+        // let transfer_pyusd_context = TransferChecked {
+        //     from: ctx.accounts.sender_token_account.to_account_info(),
+        //     mint: ctx.accounts.mint.to_account_info(),
+        //     to: ctx.accounts.recipient_token_account.to_account_info(),
+        //     authority: ctx.accounts.sender.to_account_info(),
+        // };
 
-        let cpi_ctx = CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            transfer_pyusd_context
-        );
+        // let cpi_ctx = CpiContext::new(
+        //     ctx.accounts.token_program.to_account_info(),
+        //     transfer_pyusd_context
+        // );
 
-        token_2022::transfer_checked(cpi_ctx, amount, 6)?;
+        // token_2022::transfer_checked(cpi_ctx, amount, 6)?;
+
+        //// Attempt 2
+        let ix = spl_token_2022::instruction::transfer_checked(
+            ctx.accounts.token_program.key,
+            ctx.accounts.sender_token_account.key,
+            ctx.accounts.mint.key,
+            ctx.accounts.recipient_token_account.key,
+            ctx.accounts.sender.key,
+            &[],
+            amount,
+            6,
+        )?;
+        invoke(
+            &ix,
+            &[
+                ctx.accounts.sender_token_account.to_account_info(),
+                ctx.accounts.mint.to_account_info(),
+                ctx.accounts.recipient_token_account.to_account_info(),
+                ctx.accounts.sender.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+            ];
+        )
 
         state.nft_states[token_id as usize] = 1; // this represents 'Payment made, transfer left'
         state.pending_owner[token_id as usize] = sender_ata.key().to_bytes(); // pending owner set to the payer
